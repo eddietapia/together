@@ -55,6 +55,7 @@ npm run reset
 ### Tools used
 - **Claude Code** — For iterating on changes
 - **My own custom built cloud Agent Development Environment** - UI layer on top of OpenCode to multi-task easily
+- **Webstorm** When I needed to view files.
 - **Pen and paper** - For brainstorming
 
 ### What worked well
@@ -75,7 +76,7 @@ Everything lol but highest priority would be:
 - **Add a Multiplayer mode** — Didn't get to this part.
 - **Diff viewer** — This needs a lot of work for it to feel great.
 - **Automated test suite** — Tests are great but didn't get to it.
-- **Forking Checkoints to smaller checkpoints** - The idea of forking certain changes into smaller checkpoints is interesting and wish I could've had time to finish implementing it.
+- **Forking Checkpoints to smaller checkpoints** - The idea of forking certain changes into smaller checkpoints is interesting and wish I could've had time to finish implementing it.
 - **Finish the implementation end to end**
 
 ---
