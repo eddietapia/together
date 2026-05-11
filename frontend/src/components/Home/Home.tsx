@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 import type { SubmissionSummary } from '@/types/submission';
 import { matchesSubmissionFilter } from '@/lib/utils';
@@ -242,6 +243,8 @@ function BottomCommandCard({
   easterEggActive: boolean;
   onCompanionClick: () => void;
 }) {
+  const [focused, setFocused] = useState(false);
+
   return (
     <div className="absolute left-1/2 bottom-7 z-20 w-[min(700px,calc(100%-4rem))] -translate-x-1/2">
       <div className="mb-5 flex items-start justify-center gap-4">
@@ -276,18 +279,61 @@ function BottomCommandCard({
         </div>
         <label className="flex items-center gap-2 px-4 py-3">
           <Search className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchFilter}
-            onChange={e => onSearchFilterChange(e.target.value)}
-            placeholder="Search checkpoints…"
-            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-          />
+          <div className="relative flex-1 min-w-0">
+            <input
+              type="text"
+              value={searchFilter}
+              onChange={e => onSearchFilterChange(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              className="w-full bg-transparent text-sm text-foreground focus:outline-none"
+            />
+            <AnimatedPlaceholder show={!searchFilter && !focused} />
+          </div>
           <span className="text-[10px] text-muted-foreground/70 whitespace-nowrap">
             {visibleCount} match{visibleCount === 1 ? '' : 'es'}
           </span>
         </label>
       </div>
     </div>
+  );
+}
+
+const SEARCH_PHRASES = [
+  'Search checkpoints…',
+  'Search by keyword…',
+  'Search by date…',
+  'Search by author…',
+  "Try 'pending' or 'approved'…",
+  'Search by risk level…',
+  'Search by file count…',
+];
+
+function AnimatedPlaceholder({ show }: { show: boolean }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (!show) return;
+    const id = window.setInterval(() => {
+      setIndex(prev => (prev + 1) % SEARCH_PHRASES.length);
+    }, 2800);
+    return () => window.clearInterval(id);
+  }, [show]);
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      {show && (
+        <motion.span
+          key={index}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -5 }}
+          transition={{ duration: 0.2, ease: [0.22, 0.61, 0.36, 1] }}
+          className="pointer-events-none absolute inset-0 flex items-center text-sm text-muted-foreground select-none"
+        >
+          {SEARCH_PHRASES[index]}
+        </motion.span>
+      )}
+    </AnimatePresence>
   );
 }
