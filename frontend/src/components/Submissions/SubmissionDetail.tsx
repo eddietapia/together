@@ -26,6 +26,7 @@ export function SubmissionDetail({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFileId, setExpandedFileId] = useState<string | null>(null);
+  const [manualExpandedFileId, setManualExpandedFileId] = useState<string | null>(null);
   const [activeStepId, setActiveStepId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export function SubmissionDetail({
           setData(d);
           setActiveStepId(null);
           setExpandedFileId(null);
+          setManualExpandedFileId(null);
         }
       })
       .catch(err => {
@@ -64,6 +66,19 @@ export function SubmissionDetail({
     return c;
   }, [data]);
 
+  const activeStep = useMemo(() => {
+    if (!walkthrough) return null;
+    return walkthrough.steps.find(step => step.id === activeStepId) ?? walkthrough.steps[0] ?? null;
+  }, [activeStepId, walkthrough]);
+
+  useEffect(() => {
+    if (!walkthrough || !data || activeStepId !== null) return;
+    const firstStep = walkthrough.steps[0];
+    if (!firstStep) return;
+    setActiveStepId(firstStep.id);
+    setExpandedFileId(firstPendingFileId(firstStep, data.files));
+  }, [activeStepId, data, walkthrough]);
+
   function applyFileUpdate(updated: SubmissionFile) {
     setData(prev =>
       prev
@@ -75,13 +90,57 @@ export function SubmissionDetail({
     );
   }
 
-  function handleSelectStep(step: WalkthroughStep) {
-    setActiveStepId(step.id);
-    setExpandedFileId(null);
+  function firstPendingFileId(step: WalkthroughStep, files: SubmissionFile[]): string | null {
+    const fileById = new Map(files.map(file => [file.id, file]));
+    return step.fileIds.find(fileId => fileById.get(fileId)?.status === 'pending') ?? step.fileIds[0] ?? null;
   }
 
-  function handleToggleFile(fileId: string) {
+  function handleSelectStep(step: WalkthroughStep) {
+    setActiveStepId(step.id);
+    setExpandedFileId(firstPendingFileId(step, data?.files ?? []));
+  }
+
+  function handleToggleGuidedFile(fileId: string) {
+    const step = walkthrough?.steps.find(s => s.fileIds.includes(fileId));
+    if (step && step.id !== activeStepId) setActiveStepId(step.id);
     setExpandedFileId(prev => (prev === fileId ? null : fileId));
+  }
+
+  function handleGuidedFileUpdate(updated: SubmissionFile) {
+    applyFileUpdate(updated);
+
+    if (!walkthrough || !data || updated.status === 'pending') return;
+
+    const nextFiles = data.files.map(file => (file.id === updated.id ? updated : file));
+    const fileById = new Map(nextFiles.map(file => [file.id, file]));
+    const currentStep =
+      activeStep ?? walkthrough.steps.find(step => step.fileIds.includes(updated.id));
+    if (!currentStep) {
+      setExpandedFileId(null);
+      return;
+    }
+
+    const currentFileIndex = currentStep.fileIds.indexOf(updated.id);
+    const nextInStep = currentStep.fileIds
+      .slice(currentFileIndex + 1)
+      .find(fileId => fileById.get(fileId)?.status === 'pending');
+    if (nextInStep) {
+      setExpandedFileId(nextInStep);
+      return;
+    }
+
+    const currentStepIndex = walkthrough.steps.findIndex(step => step.id === currentStep.id);
+    const nextStep = walkthrough.steps
+      .slice(currentStepIndex + 1)
+      .find(step => step.fileIds.some(fileId => fileById.get(fileId)?.status === 'pending'));
+
+    if (nextStep) {
+      setActiveStepId(nextStep.id);
+      setExpandedFileId(firstPendingFileId(nextStep, nextFiles));
+      return;
+    }
+
+    setExpandedFileId(null);
   }
 
   return (
@@ -147,23 +206,34 @@ export function SubmissionDetail({
                   activeStepId={activeStepId ?? walkthrough.steps[0]?.id ?? null}
                   expandedFileId={expandedFileId}
                   onSelectStep={handleSelectStep}
-                  onToggleFile={handleToggleFile}
-                  onUpdatedFile={applyFileUpdate}
+                  onToggleFile={handleToggleGuidedFile}
+                  onUpdatedFile={handleGuidedFileUpdate}
                 />
               )}
 
               <section>
-                <h2 className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-2 px-2">
-                  All evidence files ({data.files.length})
-                </h2>
+                <div className="mb-2 px-2">
+                  <h2 className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    All evidence files ({data.files.length})
+                  </h2>
+                  <p className="mt-1 text-[11px] text-muted-foreground/80">
+                    Skip the walkthrough and review any file directly.
+                  </p>
+                </div>
                 <div className="space-y-1.5">
                   {data.files.map(f => (
                     <FileRow
                       key={f.id}
                       file={f}
-                      expanded={expandedFileId === f.id}
-                      onToggle={() => handleToggleFile(f.id)}
-                      onUpdated={applyFileUpdate}
+                      expanded={manualExpandedFileId === f.id}
+                      onToggle={() =>
+                        setManualExpandedFileId(prev => (prev === f.id ? null : f.id))
+                      }
+                      onUpdated={updated => {
+                        applyFileUpdate(updated);
+                        if (updated.status !== 'pending') setManualExpandedFileId(null);
+                      }}
+                      insight={walkthrough?.fileInsights[f.id]}
                     />
                   ))}
                 </div>
