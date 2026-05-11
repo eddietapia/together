@@ -7,6 +7,7 @@ import { FileDiff } from '@/components/FilePreview/FileDiff';
 import { formatBytes } from '@/lib/utils';
 import { REVIEW_PILL } from '@/constants/statusStyles';
 import { ReviewActions } from './ReviewActions';
+import type { FileReviewInsight } from '@/lib/reviewWalkthrough';
 
 type ViewMode = 'preview' | 'diff';
 
@@ -39,11 +40,13 @@ export function FileRow({
   expanded,
   onToggle,
   onUpdated,
+  insight,
 }: {
   file: SubmissionFile;
   expanded: boolean;
   onToggle: () => void;
   onUpdated: (f: SubmissionFile) => void;
+  insight?: FileReviewInsight;
 }) {
   const [viewMode, setViewMode] = useState<ViewMode>(
     file.action === 'updated' ? 'diff' : 'preview',
@@ -95,6 +98,25 @@ export function FileRow({
 
       {expanded && (
         <div className="px-4 pb-4 pt-1 space-y-3 border-t border-border/60 bg-[#fffdf7]/60">
+          {insight && (
+            <div className="pt-3 rounded-md border border-border bg-white px-3 py-2 space-y-1.5">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                {insight.role}
+              </p>
+              <p className="text-xs text-foreground leading-relaxed">{insight.reviewerFocus}</p>
+              <p className="text-[11px] text-muted-foreground/80 italic">{insight.value}</p>
+              {insight.evidence.length > 0 && (
+                <ul className="space-y-0.5">
+                  {insight.evidence.map(e => (
+                    <li key={e} className="text-[11px] text-muted-foreground/70 flex gap-1.5">
+                      <span aria-hidden>·</span>
+                      {e}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
           {file.message && (
             <p className="text-xs text-muted-foreground italic leading-relaxed pt-3">
               {file.message}

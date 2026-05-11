@@ -8,6 +8,12 @@ import { fetchSubmission } from '@/api/submissions';
 import { formatRelativeTime } from '@/lib/utils';
 import { STATUS_PILL } from '@/constants/statusStyles';
 import { FileRow } from './FileRow';
+import { ReviewWalkthrough } from './ReviewWalkthrough';
+import {
+  getSubmissionWalkthrough,
+  type SubmissionWalkthrough,
+  type WalkthroughStep,
+} from '@/lib/reviewWalkthrough';
 
 export function SubmissionDetail({
   submissionId,
@@ -20,6 +26,7 @@ export function SubmissionDetail({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFileId, setExpandedFileId] = useState<string | null>(null);
+  const [activeStepId, setActiveStepId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -27,7 +34,11 @@ export function SubmissionDetail({
     setError(null);
     fetchSubmission(submissionId)
       .then(d => {
-        if (!cancelled) setData(d);
+        if (!cancelled) {
+          setData(d);
+          setActiveStepId(null);
+          setExpandedFileId(null);
+        }
       })
       .catch(err => {
         if (!cancelled) {
@@ -41,6 +52,11 @@ export function SubmissionDetail({
       cancelled = true;
     };
   }, [submissionId]);
+
+  const walkthrough = useMemo<SubmissionWalkthrough | null>(
+    () => (data ? getSubmissionWalkthrough(data) : null),
+    [data],
+  );
 
   const counts = useMemo(() => {
     const c = { pending: 0, approved: 0, rejected: 0 };
@@ -59,6 +75,15 @@ export function SubmissionDetail({
     );
   }
 
+  function handleSelectStep(step: WalkthroughStep) {
+    setActiveStepId(step.id);
+    setExpandedFileId(null);
+  }
+
+  function handleToggleFile(fileId: string) {
+    setExpandedFileId(prev => (prev === fileId ? null : fileId));
+  }
+
   return (
     <>
       <header className="flex-shrink-0 bg-[#faf7f0] border-b border-border px-6 py-4">
@@ -67,7 +92,7 @@ export function SubmissionDetail({
           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-2"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
-          All submissions
+          All checkpoints
         </button>
         {data && (
           <>
@@ -95,7 +120,7 @@ export function SubmissionDetail({
         <div className="max-w-4xl mx-auto px-6 py-5 space-y-5">
           {loading ? (
             <p className="text-xs text-muted-foreground animate-pulse px-2 py-3">
-              Loading submission…
+              Loading checkpoint…
             </p>
           ) : error ? (
             <div className="px-3 py-2.5 rounded-md bg-red-50 border border-red-200">
@@ -106,15 +131,30 @@ export function SubmissionDetail({
             <>
               {data.submission.description && (
                 <section className="bg-card border border-border rounded-xl p-4">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-1">
+                    Agent claim
+                  </p>
                   <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
                     {data.submission.description}
                   </p>
                 </section>
               )}
 
+              {walkthrough && walkthrough.steps.length > 0 && (
+                <ReviewWalkthrough
+                  walkthrough={walkthrough}
+                  files={data.files}
+                  activeStepId={activeStepId ?? walkthrough.steps[0]?.id ?? null}
+                  expandedFileId={expandedFileId}
+                  onSelectStep={handleSelectStep}
+                  onToggleFile={handleToggleFile}
+                  onUpdatedFile={applyFileUpdate}
+                />
+              )}
+
               <section>
                 <h2 className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-2 px-2">
-                  Files ({data.files.length})
+                  All evidence files ({data.files.length})
                 </h2>
                 <div className="space-y-1.5">
                   {data.files.map(f => (
@@ -122,9 +162,7 @@ export function SubmissionDetail({
                       key={f.id}
                       file={f}
                       expanded={expandedFileId === f.id}
-                      onToggle={() =>
-                        setExpandedFileId(prev => (prev === f.id ? null : f.id))
-                      }
+                      onToggle={() => handleToggleFile(f.id)}
                       onUpdated={applyFileUpdate}
                     />
                   ))}
@@ -132,7 +170,7 @@ export function SubmissionDetail({
               </section>
 
               <section className="flex items-center gap-2 pt-2 border-t border-border">
-                <DisabledAction label="Merge submission" />
+                <DisabledAction label="Merge checkpoint" />
                 <p className="text-[11px] text-muted-foreground/70 ml-auto">
                   {counts.approved} approved · {counts.pending} pending ·{' '}
                   {counts.rejected} rejected
