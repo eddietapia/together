@@ -1,0 +1,46 @@
+{
+  "name": "together",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n frontend,backend -c cyan,magenta \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && vite",
+    "dev:backend": "cd backend && npm run dev",
+    "build:frontend": "cd frontend && tsc && vite build",
+    "build:backend": "cd backend && npm run build",
+    "build:electron": "cd electron && npm run build",
+    "build": "npm run build:frontend && npm run build:backend && npm run build:electron",
+    "electron:start": "npm run build:electron && concurrently -n frontend,backend,electron -c cyan,magenta,yellow \"npm run dev:frontend\" \"npm run dev:backend\" \"wait-on http://localhost:5174 && npm run electron\"",
+    "electron": "cross-env NODE_ENV=development electron ./electron/dist/main.js",
+    "reset": "cd backend && npx tsx scripts/reset.ts"
+  },
+  "workspaces": [
+    "frontend",
+    "backend",
+    "electron"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.together.app",
+    "productName": "Together",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "electron/dist/**/*",
+      "frontend/dist/**/*",
+      "backend/dist/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": ["dmg"]
+    }
+  }
+}

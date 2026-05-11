@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-electron/
+workspace/
+.DS_Store
+.env
+.env.local
+*.log
+.idea/
+.vscode/

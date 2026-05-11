@@ -1,0 +1,16 @@
+{
+  "name": "together-electron",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/main.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "electron": "^28.1.0",
+    "typescript": "^5.5.3"
+  }
+}
