@@ -118,7 +118,7 @@ export function HomePanel({
 
       <section className="px-2 pt-3 pb-4 border-t border-border/60">
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-1.5 px-2 mt-1">
-          Checkpoint
+          Checkpoints
           {isFiltered && (
             <span className="normal-case tracking-normal text-muted-foreground/55 ml-1">
               ({visibleSubmissions.length} shown)
