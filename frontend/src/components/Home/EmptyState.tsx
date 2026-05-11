@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import companionSign from '@/assets/white-blood-cell-with-anit-virus-sign.png';
+import companionSign from '@/assets/white-blood-cell-with-anti-virus-sign.png';
 
 export function EmptyState() {
   return (

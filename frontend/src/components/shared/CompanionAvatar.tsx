@@ -1,4 +1,4 @@
-import companionImg from '@/assets/white-blood-cell-with-anit-virus-sign.png';
+import companionImg from '@/assets/white-blood-cell-with-anti-virus-sign.png';
 
 export function CompanionAvatar({
   alt,
