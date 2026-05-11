@@ -132,7 +132,7 @@ export function AppShell() {
       )}
 
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait">
           <motion.div
             key={`${active}:${selectedSubmissionId ?? 'list'}`}
             className="absolute inset-0 flex flex-col overflow-hidden"
