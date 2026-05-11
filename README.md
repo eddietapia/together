@@ -75,6 +75,7 @@ Everything lol but highest priority would be:
 - **Add a Multiplayer mode** — Didn't get to this part.
 - **Diff viewer** — This needs a lot of work for it to feel great.
 - **Automated test suite** — Tests are great but didn't get to it.
+- **Forking Checkoints to smaller checkpoints** - The idea of forking certain changes into smaller checkpoints is interesting and wish I could've had time to finish implementing it.
 - **Finish the implementation end to end**
 
 ---
