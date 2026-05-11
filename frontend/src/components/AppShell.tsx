@@ -140,9 +140,9 @@ export function AppShell() {
           <motion.div
             key={`${active}:${selectedSubmissionId ?? 'list'}`}
             className="absolute inset-0 flex flex-col overflow-hidden"
-            initial={{ opacity: 0, y: 8, filter: 'blur(2px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -6, filter: 'blur(1px)' }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
           >
             {active === 'home' && (
