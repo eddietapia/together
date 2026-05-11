@@ -66,7 +66,7 @@ export function SubmissionsList({
         <div>
           <div className="flex items-baseline gap-3">
             <h1 className="text-base font-semibold text-foreground">
-              Checkpoints
+              Checkpoint
             </h1>
             <span className="text-xs text-muted-foreground">
               {submissions.length}{' '}
