@@ -77,6 +77,9 @@ function StepCard({
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
             {step.summary}
           </p>
+          <p className="text-[11px] text-muted-foreground/60 italic mt-1 leading-relaxed">
+            {step.why}
+          </p>
           <div className="flex flex-wrap gap-1.5 mt-2">
             {files.map(file => (
               <span
