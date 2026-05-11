@@ -19,6 +19,17 @@ export async function fetchSubmission(id: string): Promise<SubmissionDetail> {
   return (await res.json()) as SubmissionDetail;
 }
 
+export async function approveAllSubmissionFiles(submissionId: string): Promise<void> {
+  const res = await fetch(
+    `/api/submissions/${encodeURIComponent(submissionId)}/approve-all`,
+    { method: 'PATCH' }
+  );
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(data.error ?? `approve all failed: ${res.status}`);
+  }
+}
+
 export type FileVersion = 'proposed' | 'current';
 
 export function submissionFileContentUrl(

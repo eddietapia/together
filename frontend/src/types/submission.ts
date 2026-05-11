@@ -10,6 +10,11 @@ export interface SubmissionSummary {
   createdAt: number;
   status: SubmissionStatus;
   fileCount: number;
+  reviewProgress: {
+    pending: number;
+    approved: number;
+    rejected: number;
+  };
   fileActions: {
     created: number;
     updated: number;

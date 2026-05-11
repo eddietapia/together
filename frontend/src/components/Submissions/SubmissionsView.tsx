@@ -20,7 +20,7 @@ export function SubmissionsView({
   categoryFilter: SubmissionCategory | null;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
-  onRefresh: () => void;
+  onRefresh: () => Promise<void>;
 }) {
   if (selectedId) {
     return (

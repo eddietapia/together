@@ -31,6 +31,12 @@ export interface SubmissionWalkthrough {
   fileInsights: Record<string, FileReviewInsight>;
 }
 
+export interface SubmissionReviewPlanSummary {
+  risk: ReviewRisk;
+  primaryQuestion: string;
+  steps: Array<Pick<WalkthroughStep, 'title' | 'kicker' | 'risk'>>;
+}
+
 const WALKTHROUGHS: Record<string, SubmissionWalkthrough> = {
   submission_1: {
     headline: 'Confirm the first DESeq2 result package is scientifically coherent.',
@@ -573,6 +579,22 @@ export function getSubmissionWalkthrough(
     steps: tailored.steps.map(step => ({
       ...step,
       fileIds: step.fileIds.filter(fileId => knownFileIds.has(fileId)),
+    })),
+  };
+}
+
+export function getSubmissionReviewPlanSummary(
+  submissionId: string,
+): SubmissionReviewPlanSummary | null {
+  const walkthrough = WALKTHROUGHS[submissionId];
+  if (!walkthrough) return null;
+  return {
+    risk: walkthrough.risk,
+    primaryQuestion: walkthrough.primaryQuestion,
+    steps: walkthrough.steps.map(step => ({
+      title: step.title,
+      kicker: step.kicker,
+      risk: step.risk,
     })),
   };
 }

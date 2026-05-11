@@ -18,12 +18,12 @@ function shortId(id: string): string {
 
 function getHomeSummary(submissions: SubmissionSummary[]): string {
   const total = submissions.length;
-  const pending = submissions.filter(s => s.status === 'pending').length;
+  const needsReview = submissions.filter(s => s.reviewProgress.pending > 0).length;
 
   if (total === 0) return 'No checkpoints yet.';
-  if (pending === 0) return 'All caught up. Nothing in the queue right now.';
+  if (needsReview === 0) return 'All caught up. Every checkpoint file has been reviewed.';
 
-  return `${pending} pending checkpoints, all on the same RNA-seq study. The newest re-runs the analysis after flagging sample S07 as an outlier.`;
+  return `${needsReview} checkpoints still need file review. The newest re-runs the analysis after flagging sample S07 as an outlier.`;
 }
 
 export function HomePanel({
@@ -64,10 +64,12 @@ export function HomePanel({
     .filter(
       s => !categoryFilter || getSubmissionCategory(s) === categoryFilter
     );
-  const pending = visibleSubmissions.filter(s => s.status === 'pending');
+  const pending = visibleSubmissions.filter(s => s.reviewProgress.pending > 0);
+  const reviewed = visibleSubmissions.filter(
+    s => s.fileCount > 0 && s.reviewProgress.pending === 0 && s.status !== 'merged'
+  );
   const merged = visibleSubmissions.filter(s => s.status === 'merged');
-  const approved: SubmissionSummary[] = [];
-  const reviewedCount = visibleSubmissions.length - pending.length;
+  const reviewedCount = reviewed.length + merged.length;
   const isFiltered = !!searchFilter.trim() || categoryFilter !== null;
 
   return (
@@ -132,9 +134,9 @@ export function HomePanel({
             onSelect={onOpenSubmission}
           />
           <SubmissionGroup
-            label="Approved"
-            count={approved.length}
-            items={approved}
+            label="Reviewed"
+            count={reviewed.length}
+            items={reviewed}
             onSelect={onOpenSubmission}
           />
           <SubmissionGroup

@@ -24,6 +24,9 @@ interface SubmissionSummaryRow extends SubmissionRow {
   created_count: number;
   updated_count: number;
   deleted_count: number;
+  pending_file_count: number;
+  approved_file_count: number;
+  rejected_file_count: number;
 }
 
 interface SubmissionFileRow {
@@ -49,6 +52,11 @@ function summaryToApi(row: SubmissionSummaryRow) {
     createdAt: row.created_at,
     status: row.status,
     fileCount: row.file_count,
+    reviewProgress: {
+      pending: row.pending_file_count,
+      approved: row.approved_file_count,
+      rejected: row.rejected_file_count,
+    },
     fileActions: {
       created: row.created_count,
       updated: row.updated_count,
@@ -98,7 +106,10 @@ export function submissionsRouter(): Router {
            COUNT(f.id) AS file_count,
            COALESCE(SUM(CASE WHEN f.action = 'created' THEN 1 ELSE 0 END), 0) AS created_count,
            COALESCE(SUM(CASE WHEN f.action = 'updated' THEN 1 ELSE 0 END), 0) AS updated_count,
-           COALESCE(SUM(CASE WHEN f.action = 'deleted' THEN 1 ELSE 0 END), 0) AS deleted_count
+           COALESCE(SUM(CASE WHEN f.action = 'deleted' THEN 1 ELSE 0 END), 0) AS deleted_count,
+           COALESCE(SUM(CASE WHEN f.status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_file_count,
+           COALESCE(SUM(CASE WHEN f.status = 'approved' THEN 1 ELSE 0 END), 0) AS approved_file_count,
+           COALESCE(SUM(CASE WHEN f.status = 'rejected' THEN 1 ELSE 0 END), 0) AS rejected_file_count
          FROM submissions s
          LEFT JOIN submission_files f ON f.submission_id = s.id
          GROUP BY s.id

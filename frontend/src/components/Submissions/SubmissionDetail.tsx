@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronLeft } from 'lucide-react';
+import { CheckCircle2, ChevronLeft } from 'lucide-react';
 import type {
   SubmissionDetail as SubmissionDetailType,
   SubmissionFile,
 } from '@/types/submission';
-import { fetchSubmission } from '@/api/submissions';
+import { approveAllSubmissionFiles, fetchSubmission } from '@/api/submissions';
 import { formatRelativeTime } from '@/lib/utils';
 import { STATUS_PILL } from '@/constants/statusStyles';
 import { FileRow } from './FileRow';
@@ -15,15 +15,16 @@ import {
   type WalkthroughStep,
 } from '@/lib/reviewWalkthrough';
 import { CompanionAvatar } from '@/components/shared/CompanionAvatar';
+import { ShareCheckpointButton } from './ShareCheckpointButton';
 
 export function SubmissionDetail({
   submissionId,
   onBack,
-  onRefresh: _onRefresh,
+  onRefresh,
 }: {
   submissionId: string;
   onBack: () => void;
-  onRefresh?: () => void;
+  onRefresh: () => Promise<void>;
 }) {
   const [data, setData] = useState<SubmissionDetailType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +32,8 @@ export function SubmissionDetail({
   const [expandedFileId, setExpandedFileId] = useState<string | null>(null);
   const [manualExpandedFileId, setManualExpandedFileId] = useState<string | null>(null);
   const [activeStepId, setActiveStepId] = useState<string | null>(null);
+  const [approvingAll, setApprovingAll] = useState(false);
+  const [approveAllError, setApproveAllError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -146,6 +149,34 @@ export function SubmissionDetail({
     setExpandedFileId(null);
   }
 
+  async function handleApproveAllFiles() {
+    if (!data || counts.pending === 0) return;
+    setApprovingAll(true);
+    setApproveAllError(null);
+    try {
+      await approveAllSubmissionFiles(data.submission.id);
+      setData(prev =>
+        prev
+          ? {
+              ...prev,
+              files: prev.files.map(file =>
+                file.status === 'pending'
+                  ? { ...file, status: 'approved', reviewComment: null }
+                  : file
+              ),
+            }
+          : prev,
+      );
+      setExpandedFileId(null);
+      setManualExpandedFileId(null);
+      await onRefresh();
+    } catch (err) {
+      setApproveAllError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setApprovingAll(false);
+    }
+  }
+
   return (
     <>
       <header className="flex-shrink-0 bg-[#faf7f0] border-b border-border px-6 py-4">
@@ -158,22 +189,41 @@ export function SubmissionDetail({
         </button>
         {data && (
           <>
-            <div className="flex items-baseline gap-3">
-              <h1 className="text-lg font-semibold text-foreground leading-tight">
-                {data.submission.title}
-              </h1>
-              <span
-                className={`text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                  STATUS_PILL[data.submission.status]
-                }`}
-              >
-                {data.submission.status}
-              </span>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-3">
+                  <h1 className="text-lg font-semibold text-foreground leading-tight">
+                    {data.submission.title}
+                  </h1>
+                  <span
+                    className={`text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                      STATUS_PILL[data.submission.status]
+                    }`}
+                  >
+                    {data.submission.status}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {data.submission.id} · by {data.submission.author ?? 'unknown'} ·{' '}
+                  {formatRelativeTime(new Date(data.submission.createdAt))}
+                </p>
+                {approveAllError && (
+                  <p className="text-[11px] text-red-700 mt-1">{approveAllError}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  type="button"
+                  disabled={counts.pending === 0 || approvingAll}
+                  onClick={handleApproveAllFiles}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white border border-border text-foreground rounded-md hover:bg-black/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  {approvingAll ? 'Approving…' : 'Approve all files'}
+                </button>
+                <ShareCheckpointButton submissionId={data.submission.id} />
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {data.submission.id} · by {data.submission.author ?? 'unknown'} ·{' '}
-              {formatRelativeTime(new Date(data.submission.createdAt))}
-            </p>
           </>
         )}
       </header>
