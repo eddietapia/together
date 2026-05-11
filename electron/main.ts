@@ -21,10 +21,10 @@ let trayWindow: BrowserWindow | null = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 760,
-    minWidth: 900,
-    minHeight: 560,
+    width: 1440,
+    height: 900,
+    minWidth: 1100,
+    minHeight: 620,
     resizable: true,
     frame: true,
     webPreferences: {
@@ -92,7 +92,7 @@ function createTray() {
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 18, height: 18 });
 
   tray = new Tray(icon);
-  tray.setToolTip('Together — Pending Checkpoints');
+  tray.setToolTip('Checkpoints');
 
   tray.on('click', (_event, bounds) => {
     if (!trayWindow) return;
