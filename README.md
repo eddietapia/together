@@ -4,6 +4,9 @@ A reviewer workflow for AI-generated biomedical research files. Reviewers previe
 
 Built with React + TypeScript + Tailwind on the frontend, Express + TypeScript on the backend, and wrapped in Electron as a desktop app.
 ![img.png](img.png)
+
+### Demo
+https://screen.studio/share/pdfMBu2F
 ---
 
 ## How to Run
