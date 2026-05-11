@@ -105,15 +105,11 @@ export function FileRow({
               </p>
               <p className="text-xs text-foreground leading-relaxed">{insight.reviewerFocus}</p>
               <p className="text-[11px] text-muted-foreground/80 italic">{insight.value}</p>
-              {insight.evidence.length > 0 && (
-                <ul className="space-y-0.5">
-                  {insight.evidence.map(e => (
-                    <li key={e} className="text-[11px] text-muted-foreground/70 flex gap-1.5">
-                      <span aria-hidden>·</span>
-                      {e}
-                    </li>
-                  ))}
-                </ul>
+              {insight.evidence && (
+                <p className="text-[11px] text-muted-foreground/70 flex gap-1.5">
+                  <span aria-hidden>·</span>
+                  {insight.evidence}
+                </p>
               )}
             </div>
           )}

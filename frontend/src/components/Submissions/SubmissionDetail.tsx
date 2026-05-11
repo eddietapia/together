@@ -54,7 +54,7 @@ export function SubmissionDetail({
   }, [submissionId]);
 
   const walkthrough = useMemo<SubmissionWalkthrough | null>(
-    () => (data ? getSubmissionWalkthrough(data) : null),
+    () => (data ? getSubmissionWalkthrough(data.submission, data.files) : null),
     [data],
   );
 
