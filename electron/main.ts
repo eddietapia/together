@@ -92,7 +92,7 @@ function createTray() {
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 18, height: 18 });
 
   tray = new Tray(icon);
-  tray.setToolTip('Together — Pending Reviews');
+  tray.setToolTip('Together — Pending Checkpoints');
 
   tray.on('click', (_event, bounds) => {
     if (!trayWindow) return;

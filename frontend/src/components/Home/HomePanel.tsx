@@ -20,10 +20,10 @@ function getHomeSummary(submissions: SubmissionSummary[]): string {
   const total = submissions.length;
   const pending = submissions.filter(s => s.status === 'pending').length;
 
-  if (total === 0) return 'No submissions yet.';
+  if (total === 0) return 'No checkpoints yet.';
   if (pending === 0) return 'All caught up. Nothing in the queue right now.';
 
-  return `${pending} pending agent submissions, all on the same RNA-seq study. The newest re-runs the analysis after flagging sample S07 as an outlier.`;
+  return `${pending} pending checkpoints, all on the same RNA-seq study. The newest re-runs the analysis after flagging sample S07 as an outlier.`;
 }
 
 export function HomePanel({
@@ -116,7 +116,7 @@ export function HomePanel({
 
       <section className="px-2 pt-3 pb-4 border-t border-border/60">
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-1.5 px-2 mt-1">
-          Submissions
+          Checkpoints
           {isFiltered && (
             <span className="normal-case tracking-normal text-muted-foreground/55 ml-1">
               ({visibleSubmissions.length} shown)

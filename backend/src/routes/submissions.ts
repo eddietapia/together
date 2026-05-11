@@ -112,7 +112,7 @@ export function submissionsRouter(): Router {
   router.get('/:id', (req: Request, res: Response) => {
     const id = req.params.id;
     if (!id || !VALID_ID.test(id)) {
-      res.status(400).json({ error: 'invalid submission id' });
+      res.status(400).json({ error: 'invalid checkpoint id' });
       return;
     }
 
@@ -125,7 +125,7 @@ export function submissionsRouter(): Router {
       .get(id) as SubmissionRow | undefined;
 
     if (!submission) {
-      res.status(404).json({ error: 'submission not found' });
+      res.status(404).json({ error: 'checkpoint not found' });
       return;
     }
 
@@ -272,7 +272,7 @@ export function submissionsRouter(): Router {
   router.patch('/:id/approve-all', (req: Request, res: Response) => {
     const id = req.params.id;
     if (!id || !VALID_ID.test(id)) {
-      res.status(400).json({ error: 'invalid submission id' });
+      res.status(400).json({ error: 'invalid checkpoint id' });
       return;
     }
 
@@ -282,7 +282,7 @@ export function submissionsRouter(): Router {
       .get(id) as { id: string } | undefined;
 
     if (!submission) {
-      res.status(404).json({ error: 'submission not found' });
+      res.status(404).json({ error: 'checkpoint not found' });
       return;
     }
 

@@ -11,7 +11,7 @@ export const NAV_ITEMS: Array<{
   Icon: typeof Home;
 }> = [
   { section: "home", label: "Home", Icon: Home },
-  { section: "submissions", label: "Submissions", Icon: ClipboardCheck },
+  { section: "submissions", label: "Checkpoints", Icon: ClipboardCheck },
   { section: "project-files", label: "Project Files", Icon: FolderTree },
 ];
 

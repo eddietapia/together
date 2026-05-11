@@ -29,7 +29,7 @@ function EventRow({ event }: { event: ActivityEvent }) {
   const Icon = isInit ? Sparkles : GitMerge;
   const title = isInit
     ? 'Project initialized'
-    : (event.submissionTitle ?? 'Submission merged');
+    : (event.submissionTitle ?? 'Checkpoint merged');
   const fileCount = event.payload.files.length;
 
   return (

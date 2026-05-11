@@ -65,7 +65,7 @@ export function SubmissionsPanel({
           type="text"
           value={filter}
           onChange={(e) => onFilterChange(e.target.value)}
-          placeholder="Filter submissions…"
+          placeholder="Filter checkpoints…"
           className="w-full px-2.5 py-1.5 text-xs bg-white border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
         />
       </div>
@@ -102,7 +102,7 @@ export function SubmissionsPanel({
           <p className="text-xs text-red-700 px-2 py-2">{error}</p>
         ) : matched.length === 0 ? (
           <p className="text-xs text-muted-foreground px-2 py-2">
-            {submissions.length === 0 ? "No submissions yet" : "No matches"}
+            {submissions.length === 0 ? "No checkpoints yet" : "No matches"}
           </p>
         ) : (
           <div className="space-y-0.5">

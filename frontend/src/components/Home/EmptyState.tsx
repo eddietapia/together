@@ -19,7 +19,7 @@ export function EmptyState() {
             All caught up
           </p>
           <p className="text-[11px] text-muted-foreground/70 mt-1">
-            No submissions are awaiting review.
+            No checkpoints are awaiting review.
           </p>
         </div>
       </div>

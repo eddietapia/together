@@ -89,7 +89,7 @@ export function Home({
       <div className="flex-1 flex items-center justify-center">
         <div className="px-4 py-3 rounded-md bg-red-50 border border-red-200 max-w-sm">
           <p className="text-xs text-red-800 font-medium">
-            Failed to load submissions.
+            Failed to load checkpoints.
           </p>
           <p className="text-[11px] text-red-700/80 mt-0.5">{error}</p>
         </div>
@@ -227,7 +227,7 @@ function BottomCommandCard({
             type="text"
             value={searchFilter}
             onChange={e => onSearchFilterChange(e.target.value)}
-            placeholder="Search submissions…"
+            placeholder="Search checkpoints…"
             className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
           <span className="text-[10px] text-muted-foreground/70 whitespace-nowrap">

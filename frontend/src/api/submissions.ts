@@ -7,15 +7,15 @@ import type {
 
 export async function fetchSubmissions(): Promise<SubmissionSummary[]> {
   const res = await fetch('/api/submissions');
-  if (!res.ok) throw new Error(`submissions list failed: ${res.status}`);
+  if (!res.ok) throw new Error(`checkpoint list failed: ${res.status}`);
   const data = (await res.json()) as { submissions: SubmissionSummary[] };
   return data.submissions;
 }
 
 export async function fetchSubmission(id: string): Promise<SubmissionDetail> {
   const res = await fetch(`/api/submissions/${encodeURIComponent(id)}`);
-  if (res.status === 404) throw new Error('Submission not found');
-  if (!res.ok) throw new Error(`submission detail failed: ${res.status}`);
+  if (res.status === 404) throw new Error('Checkpoint not found');
+  if (!res.ok) throw new Error(`checkpoint detail failed: ${res.status}`);
   return (await res.json()) as SubmissionDetail;
 }
 

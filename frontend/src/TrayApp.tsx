@@ -36,7 +36,7 @@ export function TrayApp() {
           draggable={false}
         />
         <span className="text-[12px] font-semibold text-white/80 flex-1 tracking-tight">
-          Pending Reviews
+          Pending Checkpoints
         </span>
         {!loading && (
           <span className="text-[10px] bg-white/10 text-white/50 rounded-full px-1.5 py-px tabular-nums">
@@ -54,7 +54,7 @@ export function TrayApp() {
         ) : submissions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-1 pb-8">
             <p className="text-[12px] text-white/45 font-medium">All clear</p>
-            <p className="text-[10px] text-white/25">No pending submissions</p>
+          <p className="text-[10px] text-white/25">No pending checkpoints</p>
           </div>
         ) : (
           submissions.map((s, i) => (

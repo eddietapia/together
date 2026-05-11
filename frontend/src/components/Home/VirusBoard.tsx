@@ -237,7 +237,7 @@ export function VirusBoard({
               transition={{ delay: 1.6, duration: 1.4, ease: "easeOut" }}
             >
               <p className="text-sm font-medium text-foreground/75 tracking-wide">
-                All submissions reviewed
+                All checkpoints reviewed
               </p>
               <p className="text-[11px] text-muted-foreground/70 mt-1">
                 The structure has dissolved.
