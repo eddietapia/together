@@ -22,7 +22,7 @@ export function ShareCheckpointButton({ submissionId }: { submissionId: string }
     <button
       type="button"
       onClick={shareCheckpoint}
-      className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-black/5 rounded-md transition-colors"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white border border-border text-foreground rounded-md hover:bg-black/5 transition-colors"
       aria-label={`Share ${submissionId}`}
     >
       <Share className="w-3.5 h-3.5" />
