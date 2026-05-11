@@ -51,6 +51,15 @@ export function AppShell() {
     setActiveStored('submissions');
   }
 
+  // Listen for navigate:submission events sent from the tray window via Electron IPC.
+  useEffect(() => {
+    if (!window.electronAPI) return;
+    return window.electronAPI.onNavigateToSubmission((id) => {
+      setSelectedSubmissionId(id);
+      setActiveStored('submissions');
+    });
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     setProjectLoading(true);

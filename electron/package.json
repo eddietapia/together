@@ -5,7 +5,7 @@
   "main": "./dist/main.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc -p tsconfig.preload.json",
     "watch": "tsc --watch"
   },
   "devDependencies": {

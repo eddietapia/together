@@ -269,5 +269,37 @@ export function submissionsRouter(): Router {
     res.json({ file: fileToApi(row) });
   });
 
+  router.patch('/:id/approve-all', (req: Request, res: Response) => {
+    const id = req.params.id;
+    if (!id || !VALID_ID.test(id)) {
+      res.status(400).json({ error: 'invalid submission id' });
+      return;
+    }
+
+    const db = getDb();
+    const submission = db
+      .prepare('SELECT id FROM submissions WHERE id = ?')
+      .get(id) as { id: string } | undefined;
+
+    if (!submission) {
+      res.status(404).json({ error: 'submission not found' });
+      return;
+    }
+
+    db.prepare(
+      `UPDATE submission_files SET status = 'approved', review_comment = NULL
+       WHERE submission_id = ? AND status = 'pending'`
+    ).run(id);
+
+    const { count } = db
+      .prepare(
+        `SELECT COUNT(*) AS count FROM submission_files
+         WHERE submission_id = ? AND status = 'pending'`
+      )
+      .get(id) as { count: number };
+
+    res.json({ success: true, pendingCount: count });
+  });
+
   return router;
 }
