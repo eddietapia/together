@@ -133,19 +133,14 @@ function FeaturedSubmissionCard({
         </div>
 
         <div className="lg:w-72 flex-shrink-0">
-          <div className="space-y-2">
-            <button
-              type="button"
-              onClick={() => onOpen(submission.id)}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity"
-            >
-              {needsReview ? 'Start review' : 'Open checkpoint'}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <div className="flex justify-center">
-              <ShareCheckpointButton submissionId={submission.id} />
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => onOpen(submission.id)}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity"
+          >
+            {needsReview ? 'Start review' : 'Open checkpoint'}
+            <ArrowRight className="w-4 h-4" />
+          </button>
           <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
             <span>{reviewedCount(submission)}/{submission.fileCount} reviewed</span>
             <span>{formatRelativeTime(new Date(submission.createdAt))}</span>
