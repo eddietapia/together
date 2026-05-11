@@ -1,9 +1,9 @@
-# Together
+# Checkpoint
 
-A reviewer workflow for AI-generated biomedical research files. Reviewers preview proposed vs current versions of images, CSVs, JSON configs, and Markdown reports, leave threaded comments, approve/reject each file, and merge approved changes into the trusted Project Files with an audit trail.
+A reviewer workflow for AI-generated biomedical research files. Reviewers preview proposed vs current versions of images, CSVs, JSON configs, and Markdown reports, approve/reject each file, and merge approved changes into the trusted Project Files.
 
 Built with React + TypeScript + Tailwind on the frontend, Express + TypeScript on the backend, and wrapped in Electron as a desktop app.
-
+![img.png](img.png)
 ---
 
 ## How to Run
