@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import type { SubmissionSummary } from '@/types/submission';
 import { matchesSubmissionFilter } from '@/lib/utils';
 import { VirusBoard } from './VirusBoard';
 import { EmptyState } from './EmptyState';
 import { CompanionAvatar } from '@/components/shared/CompanionAvatar';
+import kendrickDna from '@/assets/Kendrick-DNA.m4a';
 import {
   CATEGORY_VISUALS,
   getSubmissionCategory,
@@ -36,10 +37,43 @@ export function Home({
   onCategoryFilterChange: (category: SubmissionCategory | null) => void;
   onOpenSubmission: (id: string) => void;
 }) {
+  const [easterEggActive, setEasterEggActive] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const spikes = useMemo(
     () => submissions.filter(s => s.status === 'pending'),
     [submissions]
   );
+
+  useEffect(() => {
+    return () => {
+      if (!audioRef.current) return;
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    };
+  }, []);
+
+  function handleCompanionClick() {
+    if (easterEggActive) return;
+
+    const audio = new Audio(kendrickDna);
+    audioRef.current = audio;
+    audio.volume = 0.7;
+    audio.addEventListener(
+      'ended',
+      () => {
+        setEasterEggActive(false);
+        audioRef.current = null;
+      },
+      { once: true }
+    );
+
+    setEasterEggActive(true);
+    audio.play().catch(() => {
+      setEasterEggActive(false);
+      audioRef.current = null;
+    });
+  }
 
   const initialOrder = useMemo(() => spikes.map(x => x.id), [spikes]);
 
@@ -122,12 +156,15 @@ export function Home({
           loading={loading}
           categoryFilter={categoryFilter}
           searchFilter={searchFilter}
+          easterEggActive={easterEggActive}
           onReview={handleReview}
         />
         <BottomCommandCard
           searchFilter={searchFilter}
           onSearchFilterChange={onSearchFilterChange}
           visibleCount={visibleCount}
+          easterEggActive={easterEggActive}
+          onCompanionClick={handleCompanionClick}
         />
       </div>
     </div>
@@ -196,23 +233,33 @@ function BottomCommandCard({
   searchFilter,
   onSearchFilterChange,
   visibleCount,
+  easterEggActive,
+  onCompanionClick,
 }: {
   searchFilter: string;
   onSearchFilterChange: (s: string) => void;
   visibleCount: number;
+  easterEggActive: boolean;
+  onCompanionClick: () => void;
 }) {
   return (
     <div className="absolute left-1/2 bottom-7 z-20 w-[min(700px,calc(100%-4rem))] -translate-x-1/2">
       <div className="mb-5 flex items-start justify-center gap-4">
-        <div className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-[#fffdf7]/80 shadow-[0_10px_28px_hsla(25,25%,35%,0.10)] ring-1 ring-black/5">
+        <button
+          type="button"
+          onClick={onCompanionClick}
+          disabled={easterEggActive}
+          aria-label="Start companion easter egg"
+          className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-[#fffdf7]/80 shadow-[0_10px_28px_hsla(25,25%,35%,0.10)] ring-1 ring-black/5 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-300 disabled:cursor-default disabled:hover:scale-100"
+        >
           <CompanionAvatar
             alt="Your checkpoint companion"
             className="h-14 w-14 object-contain"
           />
           <span className="absolute -right-1 -top-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200">
-            ready
+            {easterEggActive ? 'dance' : 'ready'}
           </span>
-        </div>
+        </button>
         <div className="min-w-0 text-center">
           <h1 className="font-serif text-[40px] font-semibold leading-none tracking-[-0.04em] text-foreground">
             Hi Eddie

@@ -12,6 +12,7 @@ import {
   getSubmissionCategory,
 } from "./submissionVisuals";
 import companionSword from "@/assets/white-blood-cell-with-sword.png";
+import dancingCompanion from "@/assets/white-blood-cell-dancing-with-sign.gif";
 // CAPSID_RADIUS lives in VirusModel and stays at the original SVG-era value
 // (140). Adjust IMAGE_SIZE in VirusModel manually so the image lines up.
 
@@ -24,6 +25,7 @@ export function VirusBoard({
   loading,
   categoryFilter,
   searchFilter,
+  easterEggActive,
   onReview,
 }: {
   spikes: SubmissionSummary[];
@@ -32,6 +34,7 @@ export function VirusBoard({
   loading: boolean;
   categoryFilter: SubmissionCategory | null;
   searchFilter: string;
+  easterEggActive: boolean;
   onReview: (id: string) => void;
 }) {
   const stability = initialCount > 0 ? spikes.length / initialCount : 0;
@@ -66,6 +69,12 @@ export function VirusBoard({
     return () =>
       document.removeEventListener("pointerdown", handleDocPointerDown);
   }, [activeId]);
+
+  useEffect(() => {
+    if (!easterEggActive) return;
+    setActiveId(null);
+    setHoveredId(null);
+  }, [easterEggActive]);
 
   // Activate (pin the card) on click. Clicking the same spike again clears it.
   function activateSpike(id: string) {
@@ -185,89 +194,126 @@ export function VirusBoard({
           ))}
         </AnimatePresence>
 
-        {/* Shared bounce + float wrapper around the orb AND its interactive
-            spikes — so they move together as one assembly. */}
-        <motion.div
-          className="absolute inset-0"
-          initial={{ scale: 0.55, opacity: 0, y: 80 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          drag
-          dragConstraints={{ left: -100, right: 100, top: -80, bottom: 80 }}
-          dragElastic={0.15}
-          dragSnapToOrigin
-          whileDrag={{ scale: 1.02, cursor: "grabbing" }}
-          onDrag={(_e, { point }) => {
-            if (Math.random() > 0.6) {
-              const id = trailIdRef.current++;
-              setTrailParticles((prev) => [
-                ...prev,
-                { id, x: point.x, y: point.y },
-              ]);
-              setTimeout(() => {
-                setTrailParticles((prev) => prev.filter((p) => p.id !== id));
-              }, 800);
-            }
-          }}
-          transition={{
-            scale: {
-              type: "spring",
-              stiffness: 95,
-              damping: 9,
-              mass: 0.85,
-              delay: 0.15,
-            },
-            y: {
-              type: "spring",
-              stiffness: 90,
-              damping: 8,
-              mass: 0.95,
-              delay: 0.15,
-            },
-            opacity: { duration: 0.5, ease: "easeOut", delay: 0.15 },
-          }}
-        >
-          <motion.div
-            className="absolute inset-0"
-            animate={{ y: [0, -22, 0] }}
-            transition={{
-              duration: 4.4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            <VirusModel stability={stability} />
+        <AnimatePresence mode="wait">
+          {!easterEggActive ? (
+            /* Shared bounce + float wrapper around the orb AND its interactive
+                spikes — so they move together as one assembly. */
+            <motion.div
+              key="virus"
+              className="absolute inset-0"
+              initial={{ scale: 0.55, opacity: 0, y: 80 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.55, opacity: 0, y: -90, rotate: -5 }}
+              drag
+              dragConstraints={{ left: -100, right: 100, top: -80, bottom: 80 }}
+              dragElastic={0.15}
+              dragSnapToOrigin
+              whileDrag={{ scale: 1.02, cursor: "grabbing" }}
+              onDrag={(_e, { point }) => {
+                if (Math.random() > 0.6) {
+                  const id = trailIdRef.current++;
+                  setTrailParticles((prev) => [
+                    ...prev,
+                    { id, x: point.x, y: point.y },
+                  ]);
+                  setTimeout(() => {
+                    setTrailParticles((prev) => prev.filter((p) => p.id !== id));
+                  }, 800);
+                }
+              }}
+              transition={{
+                scale: {
+                  type: "spring",
+                  stiffness: 95,
+                  damping: 9,
+                  mass: 0.85,
+                  delay: 0.15,
+                },
+                y: {
+                  type: "spring",
+                  stiffness: 90,
+                  damping: 8,
+                  mass: 0.95,
+                  delay: 0.15,
+                },
+                opacity: { duration: 0.5, ease: "easeOut", delay: 0.15 },
+              }}
+            >
+              <motion.div
+                className="absolute inset-0"
+                animate={{ y: [0, -22, 0] }}
+                transition={{
+                  duration: 4.4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <VirusModel stability={stability} />
 
-            <AnimatePresence>
-              {initialOrder.map((id, idx) => {
-                const submission = spikeById.get(id);
-                if (!submission || !visibleIds.has(id)) return null;
-                const angle =
-                  (idx / Math.max(initialCount, 1)) * Math.PI * 2 - Math.PI / 2;
-                return (
-                  <SpikeTask
-                    key={id}
-                    submission={submission}
-                    angle={angle}
-                    radius={CAPSID_RADIUS}
-                    hovered={hoveredId === id}
-                    active={activeId === id}
-                    departing={departingId === id}
-                    onHoverChange={setHoveredId}
-                    onActivate={activateSpike}
-                  />
-                );
-              })}
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
+                <AnimatePresence>
+                  {initialOrder.map((id, idx) => {
+                    const submission = spikeById.get(id);
+                    if (!submission || !visibleIds.has(id)) return null;
+                    const angle =
+                      (idx / Math.max(initialCount, 1)) * Math.PI * 2 - Math.PI / 2;
+                    return (
+                      <SpikeTask
+                        key={id}
+                        submission={submission}
+                        angle={angle}
+                        radius={CAPSID_RADIUS}
+                        hovered={hoveredId === id}
+                        active={activeId === id}
+                        departing={departingId === id}
+                        onHoverChange={setHoveredId}
+                        onActivate={activateSpike}
+                      />
+                    );
+                  })}
+                </AnimatePresence>
+              </motion.div>
+            </motion.div>
+          ) : (
+            <div
+              key="dance-break"
+              className="absolute left-1/2 top-[43%] z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            >
+              <motion.div
+                className="flex flex-col items-center text-center"
+                initial={{ opacity: 0, y: 260, scale: 0.42, rotate: -8 }}
+                animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, y: -160, scale: 0.55, rotate: 6 }}
+                transition={{ type: "spring", stiffness: 90, damping: 12, mass: 0.9 }}
+              >
+                <motion.img
+                  src={dancingCompanion}
+                  alt="White blood cell companion dancing with an anti-virus sign"
+                  className="h-72 w-72 object-contain drop-shadow-[0_24px_45px_hsla(38,65%,45%,0.20)]"
+                  draggable={false}
+                  animate={{ y: [0, -16, 0], rotate: [-2, 2, -2] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.p
+                  className="mt-3 rounded-full bg-[#fffdf7]/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 shadow-[0_12px_30px_hsla(38,45%,40%,0.10)] ring-1 ring-amber-200/70 backdrop-blur-md"
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  dance break
+                </motion.p>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         <Particles triggered={dead} />
 
-        <SpikePreviewCard
-          submission={previewSubmission}
-          onReview={triggerReview}
-          onClose={() => setActiveId(null)}
-        />
+        {!easterEggActive && (
+          <SpikePreviewCard
+            submission={previewSubmission}
+            onReview={triggerReview}
+            onClose={() => setActiveId(null)}
+          />
+        )}
 
         {dead && (
           <div
