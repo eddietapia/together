@@ -11,6 +11,7 @@ import {
   type SubmissionCategory,
   getSubmissionCategory,
 } from "./submissionVisuals";
+import companionSword from "@/assets/white-blood-cell-with-sword.png";
 // CAPSID_RADIUS lives in VirusModel and stays at the original SVG-era value
 // (140). Adjust IMAGE_SIZE in VirusModel manually so the image lines up.
 
@@ -105,9 +106,53 @@ export function VirusBoard({
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(circle at 50% 50%, hsla(36, 40%, 88%, 0.25) 0%, hsla(32, 30%, 92%, 0.08) 28%, transparent 55%)",
+            "radial-gradient(circle at 50% 42%, hsla(42, 95%, 72%, 0.22) 0%, hsla(40, 85%, 80%, 0.14) 26%, hsla(38, 70%, 88%, 0.06) 48%, transparent 68%)",
         }}
       />
+
+      <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          className="absolute left-1/2 top-[43%] h-[760px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle, hsla(43, 96%, 78%, 0.16) 0%, hsla(43, 90%, 77%, 0.06) 34%, transparent 63%)",
+            boxShadow:
+              "0 0 130px hsla(43, 95%, 72%, 0.18), inset 0 0 95px hsla(43, 95%, 82%, 0.12)",
+          }}
+          animate={{ scale: [0.98, 1.03, 0.98], opacity: [0.72, 0.95, 0.72] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {[0, 1, 2].map((ring) => (
+          <motion.div
+            key={ring}
+            className="absolute left-1/2 top-[43%] -translate-x-1/2 -translate-y-1/2 rounded-full border"
+            style={{
+              width: 460 + ring * 150,
+              height: 460 + ring * 150,
+              borderColor: `hsla(43, 96%, 70%, ${0.14 - ring * 0.03})`,
+              boxShadow: `0 0 ${28 + ring * 18}px hsla(43, 96%, 72%, ${0.08 - ring * 0.015})`,
+            }}
+            animate={{
+              scale: [1, 1.018 + ring * 0.006, 1],
+              opacity: [0.44 - ring * 0.08, 0.72 - ring * 0.1, 0.44 - ring * 0.08],
+            }}
+            transition={{
+              duration: 6.5 + ring * 1.4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: ring * 0.55,
+            }}
+          />
+        ))}
+        <div
+          className="absolute left-1/2 top-[43%] h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40"
+          style={{
+            background:
+              "conic-gradient(from 18deg, transparent 0deg, hsla(43, 96%, 72%, 0.10) 36deg, transparent 80deg, transparent 160deg, hsla(43, 96%, 72%, 0.08) 208deg, transparent 270deg, hsla(43, 96%, 72%, 0.06) 318deg, transparent 360deg)",
+            filter: "blur(18px)",
+          }}
+        />
+      </div>
 
       <AmbientField count={18} />
 
@@ -236,6 +281,12 @@ export function VirusBoard({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.6, duration: 1.4, ease: "easeOut" }}
             >
+              <img
+                src={companionSword}
+                alt="White blood cell companion with sword"
+                className="mx-auto mb-3 h-24 w-24 object-contain drop-shadow-[0_12px_24px_hsla(25,25%,35%,0.12)]"
+                draggable={false}
+              />
               <p className="text-sm font-medium text-foreground/75 tracking-wide">
                 All checkpoints reviewed
               </p>

@@ -14,6 +14,7 @@ import {
   type SubmissionWalkthrough,
   type WalkthroughStep,
 } from '@/lib/reviewWalkthrough';
+import { CompanionAvatar } from '@/components/shared/CompanionAvatar';
 
 export function SubmissionDetail({
   submissionId,
@@ -188,6 +189,26 @@ export function SubmissionDetail({
             </div>
           ) : data ? (
             <>
+              <section className="flex items-center gap-4 rounded-xl border border-black/5 bg-[#fffdf7] p-4 shadow-[0_10px_28px_hsla(25,25%,35%,0.06)]">
+                <div className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-white/70 ring-1 ring-black/5">
+                  <CompanionAvatar
+                    alt="White blood cell checkpoint companion"
+                    className="h-14 w-14 object-contain"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
+                    Checkpoint companion
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-foreground">
+                    I found {data.files.length} evidence file{data.files.length === 1 ? '' : 's'} in this checkpoint. Let&apos;s clear them together.
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground/80">
+                    Approve or reject each change to weaken the virus.
+                  </p>
+                </div>
+              </section>
+
               {data.submission.description && (
                 <section className="bg-card border border-border rounded-xl p-4">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-1">

@@ -4,7 +4,7 @@ import type { SubmissionSummary } from '@/types/submission';
 import { matchesSubmissionFilter } from '@/lib/utils';
 import { VirusBoard } from './VirusBoard';
 import { EmptyState } from './EmptyState';
-import logoIcon from '@/assets/Biomni Lab Logo Icon.png';
+import { CompanionAvatar } from '@/components/shared/CompanionAvatar';
 import {
   CATEGORY_VISUALS,
   getSubmissionCategory,
@@ -204,16 +204,22 @@ function BottomCommandCard({
   return (
     <div className="absolute left-1/2 bottom-7 z-20 w-[min(700px,calc(100%-4rem))] -translate-x-1/2">
       <div className="mb-5 flex items-start justify-center gap-4">
-        <img
-          src={logoIcon}
-          alt=""
-          className="mt-1 h-11 w-11 flex-shrink-0 object-contain"
-          draggable={false}
-        />
+        <div className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-[#fffdf7]/80 shadow-[0_10px_28px_hsla(25,25%,35%,0.10)] ring-1 ring-black/5">
+          <CompanionAvatar
+            alt="Your checkpoint companion"
+            className="h-14 w-14 object-contain"
+          />
+          <span className="absolute -right-1 -top-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200">
+            ready
+          </span>
+        </div>
         <div className="min-w-0 text-center">
           <h1 className="font-serif text-[40px] font-semibold leading-none tracking-[-0.04em] text-foreground">
             Hi Eddie
           </h1>
+          <p className="mt-1 text-[11px] font-medium text-muted-foreground">
+            Your checkpoint companion is standing by.
+          </p>
         </div>
       </div>
 
