@@ -10,6 +10,7 @@ import {
   StatusFilter,
 } from './Submissions/SubmissionsPanel';
 import { HomePanel } from './Home/HomePanel';
+import type { SubmissionCategory } from './Home/submissionVisuals';
 
 export function ContextualPanel({
   active,
@@ -28,6 +29,9 @@ export function ContextualPanel({
   selectedSubmissionId,
   onSelectSubmission,
   onOpenSubmission,
+  homeSearchFilter,
+  homeCategoryFilter,
+  onHomeCategoryFilterChange,
 }: {
   active: Section;
   onSelect: (s: Section) => void;
@@ -45,6 +49,9 @@ export function ContextualPanel({
   selectedSubmissionId: string | null;
   onSelectSubmission: (id: string | null) => void;
   onOpenSubmission: (id: string) => void;
+  homeSearchFilter: string;
+  homeCategoryFilter: SubmissionCategory | null;
+  onHomeCategoryFilterChange: (category: SubmissionCategory | null) => void;
 }) {
   return (
     <aside className="w-72 flex-shrink-0 flex flex-col h-full bg-[#f5f2eb] border-r border-border">
@@ -66,6 +73,9 @@ export function ContextualPanel({
             loading={submissionsLoading}
             error={submissionsError}
             onOpenSubmission={onOpenSubmission}
+            searchFilter={homeSearchFilter}
+            categoryFilter={homeCategoryFilter}
+            onCategoryFilterChange={onHomeCategoryFilterChange}
           />
         ) : active === 'project-files' ? (
           <ProjectFilesPanel

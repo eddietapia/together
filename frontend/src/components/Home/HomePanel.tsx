@@ -2,8 +2,13 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import type { SubmissionSummary } from '@/types/submission';
-import { formatSubmittedDate } from '@/lib/utils';
+import { formatSubmittedDate, matchesSubmissionFilter } from '@/lib/utils';
 import { StatsPanel } from './StatsPanel';
+import {
+  CATEGORY_VISUALS,
+  getSubmissionCategory,
+  type SubmissionCategory,
+} from './submissionVisuals';
 
 function shortId(id: string): string {
   // submission_1 → S1
@@ -26,11 +31,17 @@ export function HomePanel({
   loading,
   error,
   onOpenSubmission,
+  searchFilter,
+  categoryFilter,
+  onCategoryFilterChange,
 }: {
   submissions: SubmissionSummary[];
   loading: boolean;
   error: string | null;
   onOpenSubmission: (id: string) => void;
+  searchFilter: string;
+  categoryFilter: SubmissionCategory | null;
+  onCategoryFilterChange: (category: SubmissionCategory | null) => void;
 }) {
   if (loading) {
     return (
@@ -48,12 +59,16 @@ export function HomePanel({
     );
   }
 
-  const pending = submissions.filter(s => s.status === 'pending');
-  const merged = submissions.filter(s => s.status === 'merged');
-  // 'approved' is a future per-submission state (post per-file approve, pre-merge).
-  // No status maps to it yet, so the bucket is empty until that flow lands.
+  const visibleSubmissions = submissions
+    .filter(s => matchesSubmissionFilter(s, searchFilter))
+    .filter(
+      s => !categoryFilter || getSubmissionCategory(s) === categoryFilter
+    );
+  const pending = visibleSubmissions.filter(s => s.status === 'pending');
+  const merged = visibleSubmissions.filter(s => s.status === 'merged');
   const approved: SubmissionSummary[] = [];
-  const reviewedCount = submissions.length - pending.length;
+  const reviewedCount = visibleSubmissions.length - pending.length;
+  const isFiltered = !!searchFilter.trim() || categoryFilter !== null;
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto">
@@ -66,10 +81,33 @@ export function HomePanel({
         </p>
       </section>
 
-      {submissions.length > 0 && (
+      {isFiltered && (
+        <section className="px-4 pb-3">
+          <div className="rounded-lg bg-black/5 px-3 py-2">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground/65 font-medium">
+              Active filters
+            </p>
+            <p className="mt-1 text-[11px] text-foreground/75 leading-snug">
+              {categoryFilter ? CATEGORY_VISUALS[categoryFilter].label : 'All risk'}
+              {searchFilter.trim() ? ` · ${searchFilter.trim()}` : ''}
+            </p>
+            {categoryFilter && (
+              <button
+                type="button"
+                onClick={() => onCategoryFilterChange(null)}
+                className="mt-1 text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Clear risk filter
+              </button>
+            )}
+          </div>
+        </section>
+      )}
+
+      {visibleSubmissions.length > 0 && (
         <section className="px-4 pb-3">
           <StatsPanel
-            total={submissions.length}
+            total={visibleSubmissions.length}
             pending={pending.length}
             reviewed={reviewedCount}
           />
@@ -79,6 +117,11 @@ export function HomePanel({
       <section className="px-2 pt-3 pb-4 border-t border-border/60">
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-1.5 px-2 mt-1">
           Submissions
+          {isFiltered && (
+            <span className="normal-case tracking-normal text-muted-foreground/55 ml-1">
+              ({visibleSubmissions.length} shown)
+            </span>
+          )}
         </p>
         <div className="space-y-0.5">
           <SubmissionGroup

@@ -11,6 +11,7 @@ import { ProjectFilesView } from './ProjectFiles/ProjectFilesView';
 import { SubmissionsView } from './Submissions/SubmissionsView';
 import { StatusFilter } from './Submissions/SubmissionsPanel';
 import { Home } from './Home/Home';
+import type { SubmissionCategory } from './Home/submissionVisuals';
 
 export function AppShell() {
   const [active, setActiveStored] = useLocalStorage<Section>(
@@ -35,6 +36,9 @@ export function AppShell() {
   const [submissionsError, setSubmissionsError] = useState<string | null>(null);
   const [submissionsFilter, setSubmissionsFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [homeSearchFilter, setHomeSearchFilter] = useState('');
+  const [homeCategoryFilter, setHomeCategoryFilter] =
+    useState<SubmissionCategory | null>(null);
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<
     string | null
   >(null);
@@ -133,11 +137,25 @@ export function AppShell() {
           selectedSubmissionId={selectedSubmissionId}
           onSelectSubmission={setSelectedSubmissionId}
           onOpenSubmission={openSubmission}
+          homeSearchFilter={homeSearchFilter}
+          homeCategoryFilter={homeCategoryFilter}
+          onHomeCategoryFilterChange={setHomeCategoryFilter}
         />
       )}
 
       <main className="flex-1 flex flex-col overflow-hidden">
-        {active === 'home' && <Home onOpenSubmission={openSubmission} />}
+        {active === 'home' && (
+          <Home
+            submissions={submissions}
+            loading={submissionsLoading}
+            error={submissionsError}
+            searchFilter={homeSearchFilter}
+            onSearchFilterChange={setHomeSearchFilter}
+            categoryFilter={homeCategoryFilter}
+            onCategoryFilterChange={setHomeCategoryFilter}
+            onOpenSubmission={openSubmission}
+          />
+        )}
         {active === 'project-files' && (
           <ProjectFilesView
             tree={tree}

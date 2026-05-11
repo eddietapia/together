@@ -6,8 +6,8 @@ import { SpikeTask } from "./SpikeTask";
 import { Particles } from "./Particles";
 import { AmbientField } from "./AmbientField";
 import { SpikePreviewCard } from "./SpikePreviewCard";
+import { matchesSubmissionFilter } from "@/lib/utils";
 import {
-  CATEGORY_VISUALS,
   type SubmissionCategory,
   getSubmissionCategory,
 } from "./submissionVisuals";
@@ -21,12 +21,16 @@ export function VirusBoard({
   initialOrder,
   initialCount,
   loading,
+  categoryFilter,
+  searchFilter,
   onReview,
 }: {
   spikes: SubmissionSummary[];
   initialOrder: string[];
   initialCount: number;
   loading: boolean;
+  categoryFilter: SubmissionCategory | null;
+  searchFilter: string;
   onReview: (id: string) => void;
 }) {
   const stability = initialCount > 0 ? spikes.length / initialCount : 0;
@@ -36,7 +40,6 @@ export function VirusBoard({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [departingId, setDepartingId] = useState<string | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<SubmissionCategory | null>(null);
   const navigateTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [trailParticles, setTrailParticles] = useState<
     Array<{ id: number; x: number; y: number }>
@@ -80,13 +83,12 @@ export function VirusBoard({
     }, REVIEW_TRANSITION_MS);
   }
 
-  // Filtered set of spike IDs to show (null filter = all).
+  // Filtered set of spike IDs to show.
   const visibleIds = new Set(
-    categoryFilter
-      ? spikes
-          .filter((s) => getSubmissionCategory(s) === categoryFilter)
-          .map((s) => s.id)
-      : spikes.map((s) => s.id),
+    spikes
+      .filter((s) => !categoryFilter || getSubmissionCategory(s) === categoryFilter)
+      .filter((s) => matchesSubmissionFilter(s, searchFilter))
+      .map((s) => s.id),
   );
 
   // Card visible whenever a spike is pinned, not departing, and still visible.
@@ -95,23 +97,9 @@ export function VirusBoard({
       ? (spikeById.get(activeId) ?? null)
       : null;
 
-  const categoryCounts = spikes.reduce(
-    (counts, spike) => {
-      const category = getSubmissionCategory(spike);
-      counts[category] += 1;
-      return counts;
-    },
-    {
-      "high-impact": 0,
-      conflicting: 0,
-      "low-risk": 0,
-    } satisfies Record<SubmissionCategory, number>,
-  );
-
   return (
     <div className="relative h-full w-full overflow-hidden">
-      {/* Subtle warm vignette — kept tight + low-opacity so it reads as ambient
-          glow under the virus rather than tinting the whole pane. */}
+      {/* Subtle warm vignette */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
@@ -164,14 +152,12 @@ export function VirusBoard({
           dragSnapToOrigin
           whileDrag={{ scale: 1.02, cursor: "grabbing" }}
           onDrag={(_e, { point }) => {
-            // Spawn trail particles during drag
             if (Math.random() > 0.6) {
               const id = trailIdRef.current++;
               setTrailParticles((prev) => [
                 ...prev,
                 { id, x: point.x, y: point.y },
               ]);
-              // Remove particle after animation
               setTimeout(() => {
                 setTrailParticles((prev) => prev.filter((p) => p.id !== id));
               }, 800);
@@ -232,9 +218,6 @@ export function VirusBoard({
 
         <Particles triggered={dead} />
 
-        {/* Fixed top-right preview card — populated by whichever spike is pinned.
-            Lives outside per-spike geometry so it never clips into the sidebar
-            or past the viewport edge. */}
         <SpikePreviewCard
           submission={previewSubmission}
           onReview={triggerReview}
@@ -263,75 +246,9 @@ export function VirusBoard({
           </div>
         )}
 
-        {!dead && (
-          <div className="absolute left-1/2 bottom-6 -translate-x-1/2 flex flex-col items-center gap-4">
-            <div className="rounded-2xl border border-black/5 bg-[#fffdf7]/80 px-5 py-3 shadow-[0_12px_34px_hsla(25,25%,35%,0.08)] backdrop-blur-md">
-              <div className="flex items-center gap-2">
-                {(
-                  [
-                    "high-impact",
-                    "conflicting",
-                    "low-risk",
-                  ] as SubmissionCategory[]
-                ).map((category, i) => {
-                  const visual = CATEGORY_VISUALS[category];
-                  const isActive = categoryFilter === category;
-                  return (
-                    <>
-                      {i > 0 && (
-                        <div
-                          key={`sep-${category}`}
-                          className="w-px h-7 bg-black/8 mx-1 flex-shrink-0"
-                        />
-                      )}
-                      <button
-                        key={category}
-                        type="button"
-                        onClick={() =>
-                          setCategoryFilter((prev) =>
-                            prev === category ? null : category,
-                          )
-                        }
-                        className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl transition-all ${
-                          isActive
-                            ? "bg-black/6 ring-1 ring-black/10"
-                            : "hover:bg-black/4"
-                        }`}
-                      >
-                        <span
-                          className="h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 transition-transform"
-                          style={{
-                            background: visual.soft,
-                            transform: isActive ? "scale(1.1)" : "scale(1)",
-                          }}
-                        >
-                          <span
-                            className="h-2.5 w-2.5 rounded-full"
-                            style={{ background: visual.accent }}
-                          />
-                        </span>
-                        <span className="text-left">
-                          <span className="block text-xs font-semibold text-foreground">
-                            {visual.label}
-                          </span>
-                          <span className="block text-[10px] text-muted-foreground">
-                            {isActive
-                              ? `${visibleIds.size} shown`
-                              : `${categoryCounts[category]} · ${visual.description}`}
-                          </span>
-                        </span>
-                      </button>
-                    </>
-                  );
-                })}
-              </div>
-            </div>
-
-            <p className="rounded-full bg-[#fffdf7]/65 px-4 py-2 text-[11px] font-medium text-muted-foreground shadow-[0_8px_24px_hsla(25,25%,35%,0.06)] backdrop-blur-md pointer-events-none">
-              {categoryFilter
-                ? `Showing ${CATEGORY_VISUALS[categoryFilter].label.toLowerCase()} only · click again to clear`
-                : "Click a spike to preview. Review from the card."}
-            </p>
+        {!dead && visibleIds.size === 0 && (
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 translate-y-48 rounded-full bg-[#fffdf7]/75 px-4 py-2 text-[11px] font-medium text-muted-foreground shadow-[0_8px_24px_hsla(25,25%,35%,0.06)] backdrop-blur-md pointer-events-none">
+            No spikes match the current filters.
           </div>
         )}
       </div>
