@@ -33,9 +33,13 @@ function filterTree(nodes: TreeNode[], q: string): TreeNode[] {
 export function FileTree({
   nodes,
   filter,
+  selectedPath,
+  onSelectFile,
 }: {
   nodes: TreeNode[];
   filter: string;
+  selectedPath: string | null;
+  onSelectFile: (file: FileLeaf) => void;
 }) {
   const [collapsed, setCollapsed] = useLocalStorage<string[]>(
     'together.collapsed-dirs',
@@ -66,6 +70,8 @@ export function FileTree({
               prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
             )
           }
+          selectedPath={selectedPath}
+          onSelectFile={onSelectFile}
           forceExpanded={!!filter.trim()}
         />
       ))}
@@ -78,12 +84,16 @@ function TreeRow({
   depth,
   collapsedSet,
   onToggle,
+  selectedPath,
+  onSelectFile,
   forceExpanded,
 }: {
   node: TreeNode;
   depth: number;
   collapsedSet: Set<string>;
   onToggle: (path: string) => void;
+  selectedPath: string | null;
+  onSelectFile: (file: FileLeaf) => void;
   forceExpanded: boolean;
 }) {
   if (node.kind === 'dir') {
@@ -124,6 +134,8 @@ function TreeRow({
                   depth={depth + 1}
                   collapsedSet={collapsedSet}
                   onToggle={onToggle}
+                  selectedPath={selectedPath}
+                  onSelectFile={onSelectFile}
                   forceExpanded={forceExpanded}
                 />
               ))
@@ -134,14 +146,35 @@ function TreeRow({
     );
   }
 
-  return <FileRow leaf={node} depth={depth} />;
+  return (
+    <FileRow
+      leaf={node}
+      depth={depth}
+      selected={selectedPath === node.path}
+      onSelect={() => onSelectFile(node)}
+    />
+  );
 }
 
-function FileRow({ leaf, depth }: { leaf: FileLeaf; depth: number }) {
+function FileRow({
+  leaf,
+  depth,
+  selected,
+  onSelect,
+}: {
+  leaf: FileLeaf;
+  depth: number;
+  selected: boolean;
+  onSelect: () => void;
+}) {
   const Icon = iconForFile(leaf.mimeType);
   return (
-    <div
-      className="group flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-black/5 transition-colors"
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`group flex w-full items-center gap-2 px-2 py-1.5 rounded-md transition-colors text-left ${
+        selected ? 'bg-black/10' : 'hover:bg-black/5'
+      }`}
       style={{ paddingLeft: `${8 + depth * 14 + 20}px` }}
     >
       <Icon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -152,7 +185,7 @@ function FileRow({ leaf, depth }: { leaf: FileLeaf; depth: number }) {
         {formatBytes(leaf.size)}
       </span>
       <Provenance leaf={leaf} />
-    </div>
+    </button>
   );
 }
 

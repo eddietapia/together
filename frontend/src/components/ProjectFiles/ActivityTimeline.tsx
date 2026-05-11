@@ -1,7 +1,8 @@
-import { Sparkles, GitMerge } from 'lucide-react';
+import { GitMerge } from 'lucide-react';
 import type { ActivityEvent } from '@/types/project';
 import { formatRelativeTime } from '@/lib/utils';
 import { ActionBadge } from '@/components/shared/ActionBadge';
+import logoIcon from '@/assets/Biomni Lab Logo Icon.png';
 
 export function ActivityTimeline({ events }: { events: ActivityEvent[] }) {
   if (events.length === 0) {
@@ -26,7 +27,6 @@ export function ActivityTimeline({ events }: { events: ActivityEvent[] }) {
 
 function EventRow({ event }: { event: ActivityEvent }) {
   const isInit = event.type === 'init';
-  const Icon = isInit ? Sparkles : GitMerge;
   const title = isInit
     ? 'Project initialized'
     : (event.submissionTitle ?? 'Checkpoint merged');
@@ -38,7 +38,16 @@ function EventRow({ event }: { event: ActivityEvent }) {
         aria-hidden
         className="absolute left-[-22px] top-3 w-5 h-5 flex items-center justify-center rounded-full bg-card border border-border"
       >
-        <Icon className="w-3 h-3 text-muted-foreground" />
+        {isInit ? (
+          <img
+            src={logoIcon}
+            alt=""
+            className="w-3.5 h-3.5 object-contain"
+            draggable={false}
+          />
+        ) : (
+          <GitMerge className="w-3 h-3 text-muted-foreground" />
+        )}
       </span>
       <div>
         <p className="text-sm font-medium text-foreground">{title}</p>

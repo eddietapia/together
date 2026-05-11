@@ -1,6 +1,8 @@
-import type { ActivityEvent, TreeNode } from '@/types/project';
+import { useEffect, useMemo, useState } from 'react';
+import type { ActivityEvent, FileLeaf, TreeNode } from '@/types/project';
 import { FileTree } from './FileTree';
 import { ActivityTimeline } from './ActivityTimeline';
+import { ProjectFileDetail } from './ProjectFileDetail';
 
 export function ProjectFilesView({
   tree,
@@ -15,6 +17,13 @@ export function ProjectFilesView({
   error: string | null;
   filter: string;
 }) {
+  const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  const selectedFile = useMemo(() => findFile(tree, selectedPath), [tree, selectedPath]);
+
+  useEffect(() => {
+    if (selectedPath && !selectedFile) setSelectedPath(null);
+  }, [selectedFile, selectedPath]);
+
   return (
     <>
       <header className="flex-shrink-0 bg-[#faf7f0] border-b border-border px-6 py-4">
@@ -26,16 +35,33 @@ export function ProjectFilesView({
 
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-6 py-5 space-y-8">
-          <section>
-            <SectionHeader>Files</SectionHeader>
-            {loading ? (
-              <Loading label="Loading project files…" />
-            ) : error ? (
-              <ErrorBanner message={error} />
-            ) : (
-              <FileTree nodes={tree} filter={filter} />
+          <div
+            className={
+              selectedFile
+                ? 'grid gap-5 lg:grid-cols-[minmax(260px,0.85fr)_minmax(0,1.15fr)]'
+                : 'grid gap-5'
+            }
+          >
+            <section>
+              <SectionHeader>Files</SectionHeader>
+              {loading ? (
+                <Loading label="Loading project files…" />
+              ) : error ? (
+                <ErrorBanner message={error} />
+              ) : (
+                <FileTree
+                  nodes={tree}
+                  filter={filter}
+                  selectedPath={selectedPath}
+                  onSelectFile={file => setSelectedPath(file.path)}
+                />
+              )}
+            </section>
+
+            {!loading && !error && selectedFile && (
+              <ProjectFileDetail file={selectedFile} />
             )}
-          </section>
+          </div>
 
           <section>
             <SectionHeader>Activity</SectionHeader>
@@ -49,6 +75,19 @@ export function ProjectFilesView({
       </div>
     </>
   );
+}
+
+function findFile(nodes: TreeNode[], path: string | null): FileLeaf | null {
+  if (!path) return null;
+  for (const node of nodes) {
+    if (node.kind === 'file') {
+      if (node.path === path) return node;
+      continue;
+    }
+    const found: FileLeaf | null = findFile(node.children, path);
+    if (found) return found;
+  }
+  return null;
 }
 
 function SectionHeader({ children }: { children: React.ReactNode }) {

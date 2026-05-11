@@ -28,7 +28,6 @@ export function AppShell() {
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
   const [projectLoading, setProjectLoading] = useState(true);
   const [projectError, setProjectError] = useState<string | null>(null);
-  const [projectFilter, setProjectFilter] = useState('');
 
   // Submissions state
   const [submissions, setSubmissions] = useState<SubmissionSummary[]>([]);
@@ -122,9 +121,6 @@ export function AppShell() {
           active={active}
           onSelect={setActive}
           onToggleCollapse={() => setCollapsed(true)}
-          recentActivity={activity}
-          projectFilter={projectFilter}
-          onProjectFilterChange={setProjectFilter}
           submissions={submissions}
           submissionsLoading={submissionsLoading}
           submissionsError={submissionsError}
@@ -163,7 +159,7 @@ export function AppShell() {
                 activity={activity}
                 loading={projectLoading}
                 error={projectError}
-                filter={projectFilter}
+                filter=""
               />
             )}
             {active === 'submissions' && (

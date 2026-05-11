@@ -2,9 +2,7 @@ import { useState, useRef } from 'react';
 import { MessageSquare, PanelLeft, Settings, UserPlus } from 'lucide-react';
 import { Section, TopNav } from './TopNav';
 import { Tooltip } from './Tooltip';
-import type { ActivityEvent } from '@/types/project';
 import type { SubmissionSummary } from '@/types/submission';
-import { formatRelativeTime } from '@/lib/utils';
 import { HomePanel } from './Home/HomePanel';
 import type { SubmissionCategory } from './Home/submissionVisuals';
 
@@ -12,9 +10,6 @@ export function ContextualPanel({
   active,
   onSelect,
   onToggleCollapse,
-  recentActivity,
-  projectFilter,
-  onProjectFilterChange,
   submissions,
   submissionsLoading,
   submissionsError,
@@ -26,9 +21,6 @@ export function ContextualPanel({
   active: Section;
   onSelect: (s: Section) => void;
   onToggleCollapse: () => void;
-  recentActivity: ActivityEvent[];
-  projectFilter: string;
-  onProjectFilterChange: (s: string) => void;
   submissions: SubmissionSummary[];
   submissionsLoading: boolean;
   submissionsError: string | null;
@@ -51,85 +43,19 @@ export function ContextualPanel({
       </div>
 
       <div className="flex-1 flex flex-col min-h-0 border-t border-border">
-        {active === 'home' || active === 'submissions' ? (
-          <HomePanel
-            submissions={submissions}
-            loading={submissionsLoading}
-            error={submissionsError}
-            onOpenSubmission={onOpenSubmission}
-            searchFilter={homeSearchFilter}
-            categoryFilter={homeCategoryFilter}
-            onCategoryFilterChange={onHomeCategoryFilterChange}
-          />
-        ) : active === 'project-files' ? (
-          <ProjectFilesPanel
-            recentActivity={recentActivity}
-            filter={projectFilter}
-            onFilterChange={onProjectFilterChange}
-          />
-        ) : null}
+        <HomePanel
+          submissions={submissions}
+          loading={submissionsLoading}
+          error={submissionsError}
+          onOpenSubmission={onOpenSubmission}
+          searchFilter={homeSearchFilter}
+          categoryFilter={homeCategoryFilter}
+          onCategoryFilterChange={onHomeCategoryFilterChange}
+        />
       </div>
 
       <Footer />
     </aside>
-  );
-}
-
-function ProjectFilesPanel({
-  recentActivity,
-  filter,
-  onFilterChange,
-}: {
-  recentActivity: ActivityEvent[];
-  filter: string;
-  onFilterChange: (s: string) => void;
-}) {
-  return (
-    <>
-      <div className="px-3 pt-3 pb-2">
-        <input
-          type="text"
-          value={filter}
-          onChange={e => onFilterChange(e.target.value)}
-          placeholder="Filter files…"
-          className="w-full px-2.5 py-1.5 text-xs bg-white border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
-        />
-      </div>
-
-      <div className="px-4 pt-3 pb-2">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-medium">
-          Recent
-        </p>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-2 pb-3">
-        {recentActivity.length === 0 ? (
-          <p className="text-xs text-muted-foreground px-2 py-2">
-            No activity yet
-          </p>
-        ) : (
-          <div className="space-y-0.5">
-            {recentActivity.slice(0, 5).map(ev => (
-              <div
-                key={ev.id}
-                className="px-2 py-1.5 rounded-md hover:bg-black/5 transition-colors"
-              >
-                <p className="text-xs font-medium text-foreground truncate">
-                  {ev.type === 'init'
-                    ? 'Project initialized'
-                    : (ev.submissionTitle ?? 'Merge')}
-                </p>
-                <p className="text-[10px] text-muted-foreground/70 mt-0.5">
-                  {formatRelativeTime(new Date(ev.timestamp))} ·{' '}
-                  {ev.payload.files.length}{' '}
-                  {ev.payload.files.length === 1 ? 'file' : 'files'}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
   );
 }
 
