@@ -105,16 +105,18 @@ export function ReviewActions({
         type="button"
         disabled={pending}
         onClick={() => submitStatus('approved')}
-        className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white border border-border text-foreground rounded-md hover:bg-black/5 transition-colors disabled:opacity-50"
       >
+        <span className="h-2 w-2 rounded-full bg-green-500 flex-shrink-0" />
         Approve
       </button>
       <button
         type="button"
         disabled={pending}
         onClick={() => setRejecting(true)}
-        className="px-3 py-1.5 text-xs font-medium bg-white border border-border text-foreground rounded-md hover:bg-black/5 transition-colors disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-white border border-border text-foreground rounded-md hover:bg-black/5 transition-colors disabled:opacity-50"
       >
+        <span className="h-2 w-2 rounded-full bg-red-500 flex-shrink-0" />
         Reject
       </button>
       {error && <p className="text-[11px] text-red-700 ml-2">{error}</p>}
