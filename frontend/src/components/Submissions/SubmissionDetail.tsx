@@ -19,9 +19,11 @@ import { CompanionAvatar } from '@/components/shared/CompanionAvatar';
 export function SubmissionDetail({
   submissionId,
   onBack,
+  onRefresh: _onRefresh,
 }: {
   submissionId: string;
   onBack: () => void;
+  onRefresh?: () => void;
 }) {
   const [data, setData] = useState<SubmissionDetailType | null>(null);
   const [loading, setLoading] = useState(true);

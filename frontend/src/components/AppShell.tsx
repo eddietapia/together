@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { fetchActivity, fetchTree } from '@/api/projectFiles';
@@ -83,30 +83,24 @@ export function AppShell() {
     };
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
+  const refreshSubmissions = useCallback(() => {
     setSubmissionsLoading(true);
-    fetchSubmissions()
+    return fetchSubmissions()
       .then(s => {
-        if (!cancelled) {
-          setSubmissions(s);
-          setSubmissionsError(null);
-        }
+        setSubmissions(s);
+        setSubmissionsError(null);
       })
       .catch(err => {
-        if (!cancelled) {
-          setSubmissionsError(
-            err instanceof Error ? err.message : String(err)
-          );
-        }
+        setSubmissionsError(
+          err instanceof Error ? err.message : String(err)
+        );
       })
-      .finally(() => {
-        if (!cancelled) setSubmissionsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+      .finally(() => setSubmissionsLoading(false));
   }, []);
+
+  useEffect(() => {
+    void refreshSubmissions();
+  }, [refreshSubmissions]);
 
   return (
     <div className="h-screen flex bg-[#fefdf8] overflow-hidden">
@@ -171,6 +165,7 @@ export function AppShell() {
                 categoryFilter={homeCategoryFilter}
                 selectedId={selectedSubmissionId}
                 onSelect={setSelectedSubmissionId}
+                onRefresh={refreshSubmissions}
               />
             )}
           </motion.div>

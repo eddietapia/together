@@ -11,6 +11,7 @@ export function SubmissionsView({
   categoryFilter,
   selectedId,
   onSelect,
+  onRefresh,
 }: {
   submissions: SubmissionSummary[];
   loading: boolean;
@@ -19,12 +20,14 @@ export function SubmissionsView({
   categoryFilter: SubmissionCategory | null;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  onRefresh: () => void;
 }) {
   if (selectedId) {
     return (
       <SubmissionDetail
         submissionId={selectedId}
         onBack={() => onSelect(null)}
+        onRefresh={onRefresh}
       />
     );
   }
