@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { fetchActivity, fetchTree } from '@/api/projectFiles';
 import { fetchSubmissions } from '@/api/submissions';
@@ -9,7 +10,6 @@ import { ContextualPanel } from './ContextualPanel';
 import { CollapsedRail } from './CollapsedRail';
 import { ProjectFilesView } from './ProjectFiles/ProjectFilesView';
 import { SubmissionsView } from './Submissions/SubmissionsView';
-import { StatusFilter } from './Submissions/SubmissionsPanel';
 import { Home } from './Home/Home';
 import type { SubmissionCategory } from './Home/submissionVisuals';
 
@@ -34,8 +34,6 @@ export function AppShell() {
   const [submissions, setSubmissions] = useState<SubmissionSummary[]>([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const [submissionsError, setSubmissionsError] = useState<string | null>(null);
-  const [submissionsFilter, setSubmissionsFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [homeSearchFilter, setHomeSearchFilter] = useState('');
   const [homeCategoryFilter, setHomeCategoryFilter] =
     useState<SubmissionCategory | null>(null);
@@ -130,12 +128,6 @@ export function AppShell() {
           submissions={submissions}
           submissionsLoading={submissionsLoading}
           submissionsError={submissionsError}
-          submissionsFilter={submissionsFilter}
-          onSubmissionsFilterChange={setSubmissionsFilter}
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          selectedSubmissionId={selectedSubmissionId}
-          onSelectSubmission={setSelectedSubmissionId}
           onOpenSubmission={openSubmission}
           homeSearchFilter={homeSearchFilter}
           homeCategoryFilter={homeCategoryFilter}
@@ -143,38 +135,50 @@ export function AppShell() {
         />
       )}
 
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {active === 'home' && (
-          <Home
-            submissions={submissions}
-            loading={submissionsLoading}
-            error={submissionsError}
-            searchFilter={homeSearchFilter}
-            onSearchFilterChange={setHomeSearchFilter}
-            categoryFilter={homeCategoryFilter}
-            onCategoryFilterChange={setHomeCategoryFilter}
-            onOpenSubmission={openSubmission}
-          />
-        )}
-        {active === 'project-files' && (
-          <ProjectFilesView
-            tree={tree}
-            activity={activity}
-            loading={projectLoading}
-            error={projectError}
-            filter={projectFilter}
-          />
-        )}
-        {active === 'submissions' && (
-          <SubmissionsView
-            submissions={submissions}
-            loading={submissionsLoading}
-            error={submissionsError}
-            filter={submissionsFilter}
-            selectedId={selectedSubmissionId}
-            onSelect={setSelectedSubmissionId}
-          />
-        )}
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`${active}:${selectedSubmissionId ?? 'list'}`}
+            className="absolute inset-0 flex flex-col overflow-hidden"
+            initial={{ opacity: 0, y: 8, filter: 'blur(2px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -6, filter: 'blur(1px)' }}
+            transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
+          >
+            {active === 'home' && (
+              <Home
+                submissions={submissions}
+                loading={submissionsLoading}
+                error={submissionsError}
+                searchFilter={homeSearchFilter}
+                onSearchFilterChange={setHomeSearchFilter}
+                categoryFilter={homeCategoryFilter}
+                onCategoryFilterChange={setHomeCategoryFilter}
+                onOpenSubmission={openSubmission}
+              />
+            )}
+            {active === 'project-files' && (
+              <ProjectFilesView
+                tree={tree}
+                activity={activity}
+                loading={projectLoading}
+                error={projectError}
+                filter={projectFilter}
+              />
+            )}
+            {active === 'submissions' && (
+              <SubmissionsView
+                submissions={submissions}
+                loading={submissionsLoading}
+                error={submissionsError}
+                filter={homeSearchFilter}
+                categoryFilter={homeCategoryFilter}
+                selectedId={selectedSubmissionId}
+                onSelect={setSelectedSubmissionId}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );

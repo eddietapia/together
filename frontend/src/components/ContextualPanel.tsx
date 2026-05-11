@@ -5,10 +5,6 @@ import { Tooltip } from './Tooltip';
 import type { ActivityEvent } from '@/types/project';
 import type { SubmissionSummary } from '@/types/submission';
 import { formatRelativeTime } from '@/lib/utils';
-import {
-  SubmissionsPanel,
-  StatusFilter,
-} from './Submissions/SubmissionsPanel';
 import { HomePanel } from './Home/HomePanel';
 import type { SubmissionCategory } from './Home/submissionVisuals';
 
@@ -22,12 +18,6 @@ export function ContextualPanel({
   submissions,
   submissionsLoading,
   submissionsError,
-  submissionsFilter,
-  onSubmissionsFilterChange,
-  statusFilter,
-  onStatusFilterChange,
-  selectedSubmissionId,
-  onSelectSubmission,
   onOpenSubmission,
   homeSearchFilter,
   homeCategoryFilter,
@@ -42,12 +32,6 @@ export function ContextualPanel({
   submissions: SubmissionSummary[];
   submissionsLoading: boolean;
   submissionsError: string | null;
-  submissionsFilter: string;
-  onSubmissionsFilterChange: (s: string) => void;
-  statusFilter: StatusFilter;
-  onStatusFilterChange: (s: StatusFilter) => void;
-  selectedSubmissionId: string | null;
-  onSelectSubmission: (id: string | null) => void;
   onOpenSubmission: (id: string) => void;
   homeSearchFilter: string;
   homeCategoryFilter: SubmissionCategory | null;
@@ -67,7 +51,7 @@ export function ContextualPanel({
       </div>
 
       <div className="flex-1 flex flex-col min-h-0 border-t border-border">
-        {active === 'home' ? (
+        {active === 'home' || active === 'submissions' ? (
           <HomePanel
             submissions={submissions}
             loading={submissionsLoading}
@@ -83,19 +67,7 @@ export function ContextualPanel({
             filter={projectFilter}
             onFilterChange={onProjectFilterChange}
           />
-        ) : (
-          <SubmissionsPanel
-            submissions={submissions}
-            loading={submissionsLoading}
-            error={submissionsError}
-            filter={submissionsFilter}
-            onFilterChange={onSubmissionsFilterChange}
-            statusFilter={statusFilter}
-            onStatusFilterChange={onStatusFilterChange}
-            selectedId={selectedSubmissionId}
-            onSelect={onSelectSubmission}
-          />
-        )}
+        ) : null}
       </div>
 
       <Footer />
@@ -207,4 +179,3 @@ function Footer() {
     </div>
   );
 }
-

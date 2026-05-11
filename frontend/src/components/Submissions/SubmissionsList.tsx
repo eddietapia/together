@@ -1,21 +1,31 @@
 import type { SubmissionSummary } from '@/types/submission';
 import { SubmissionCard } from './SubmissionCard';
 import { matchesSubmissionFilter } from '@/lib/utils';
+import {
+  getSubmissionCategory,
+  type SubmissionCategory,
+} from '@/components/Home/submissionVisuals';
 
 export function SubmissionsList({
   submissions,
   loading,
   error,
   filter,
+  categoryFilter,
   onOpen,
 }: {
   submissions: SubmissionSummary[];
   loading: boolean;
   error: string | null;
   filter: string;
+  categoryFilter: SubmissionCategory | null;
   onOpen: (id: string) => void;
 }) {
-  const matched = submissions.filter(s => matchesSubmissionFilter(s, filter));
+  const matched = submissions
+    .filter(s => matchesSubmissionFilter(s, filter))
+    .filter(
+      s => !categoryFilter || getSubmissionCategory(s) === categoryFilter
+    );
 
   return (
     <>
