@@ -309,6 +309,7 @@ const SEARCH_PHRASES = [
   'Type to filter…',
   'Every checkpoint has a clue…',
   'Where did that checkpoint go?',
+  "I'm just here so I don't get fined",
 ];
 
 function AnimatedPlaceholder({ show }: { show: boolean }) {
