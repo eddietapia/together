@@ -218,9 +218,8 @@ function BottomCommandCard({
       </div>
 
       <div className="rounded-2xl border border-black/10 bg-[#fffdf7]/90 shadow-[0_18px_45px_hsla(25,25%,35%,0.12)] backdrop-blur-md overflow-hidden">
-        <div className="border-b border-black/10 px-4 py-2.5 text-[11px] font-medium text-muted-foreground">
-          Merging changes makes the virus weaker! Review each checkpoint to take
-          down this virus!
+        <div className="border-b border-black/10 px-4 py-2.5 text-center text-[11px] font-medium text-muted-foreground">
+          Click the colored spikes to review each checkpoint! Merging checkpoints will take down this virus!
         </div>
         <label className="flex items-center gap-2 px-4 py-3">
           <Search className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
