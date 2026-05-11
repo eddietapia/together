@@ -29,7 +29,7 @@
   },
   "build": {
     "appId": "com.together.app",
-    "productName": "Together",
+    "productName": "Checkpoints",
     "directories": {
       "output": "dist-electron"
     },

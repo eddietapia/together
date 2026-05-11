@@ -78,7 +78,7 @@ export function TrayApp() {
           onClick={() => window.electronAPI?.openApp()}
           className="text-[10px] text-white/35 hover:text-white/65 transition-colors"
         >
-          Open Together
+          Open Checkpoints
         </button>
         <button
           type="button"
