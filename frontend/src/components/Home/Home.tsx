@@ -300,13 +300,15 @@ function BottomCommandCard({
 }
 
 const SEARCH_PHRASES = [
-  'Search checkpoints…',
-  'Search by keyword…',
-  'Search by date…',
-  'Search by author…',
-  "Try 'pending' or 'approved'…",
-  'Search by risk level…',
-  'Search by file count…',
+  'Find that one checkpoint…',
+  'Search by title or description…',
+  'What are you looking for?',
+  'Narrow down the list…',
+  'Which checkpoint needs attention?',
+  'Looking for something specific?',
+  'Type to filter…',
+  'Every checkpoint has a clue…',
+  'Where did that checkpoint go?',
 ];
 
 function AnimatedPlaceholder({ show }: { show: boolean }) {
